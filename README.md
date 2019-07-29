@@ -1,2 +1,2 @@
-# wal
-The Web Application Library (WAL) is a base library for web applications.
+### Purchase Management Library
+The library for Purchase Management web application.
