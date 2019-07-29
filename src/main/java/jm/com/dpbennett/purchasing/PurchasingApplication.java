@@ -31,7 +31,7 @@ import javax.persistence.PersistenceUnit;
  *
  * @author Desmond Bennett
  */
-@Named(value = "FinApp")
+@Named(value = "PurchApp")
 @ApplicationScoped
 @Singleton
 public class PurchasingApplication implements Serializable {
