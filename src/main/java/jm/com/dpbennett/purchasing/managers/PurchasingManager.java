@@ -729,12 +729,17 @@ public class PurchasingManager implements Serializable,
                 return false;
             }
 
-            // Do not allow flagging PR as completed unless it is approved.             
-            if (!getSelectedPurchaseRequisition().isApproved(2) // tk required num. to be made system option
+            // Do not allow flagging PR as completed unless it is approved.    
+            int requiredApprovals = 
+                    (Integer)SystemOption.getOptionValueObject(getEntityManager1(), 
+                            "requiredPRApprovals");
+            if (!getSelectedPurchaseRequisition().isApproved(
+                    requiredApprovals) 
                     && getSelectedPurchaseRequisition().getWorkProgress().equals("Completed")) {
 
-                PrimeFacesUtils.addMessage("Purchase Requisition Not Approved",
-                        "This purchase requisition is NOT approved so it cannot be marked as completed.",
+                PrimeFacesUtils.addMessage("Purchase Requisition Not Completed",
+                        "This purchase requisition requires " +  requiredApprovals + 
+                                "approvals before it can be marked as completed",
                         FacesMessage.SEVERITY_WARN);
 
                 return false;
@@ -743,7 +748,7 @@ public class PurchasingManager implements Serializable,
         } else {
 
             PrimeFacesUtils.addMessage("Purchase Requisition Work Progress Cannot be Changed",
-                    "This purchase requisition's work progress cannot be changed until it is saved.",
+                    "This purchase requisition's work progress cannot be changed until it is saved",
                     FacesMessage.SEVERITY_WARN);
             return false;
         }
@@ -1263,7 +1268,7 @@ public class PurchasingManager implements Serializable,
             }
         } else {
             PrimeFacesUtils.addMessage("Already Saved",
-                    "This purchase requisition was not saved because it was not modified or it was recently saved.",
+                    "This purchase requisition was not saved because it was not modified or it was recently saved",
                     FacesMessage.SEVERITY_INFO);
         }
 
@@ -1762,7 +1767,7 @@ public class PurchasingManager implements Serializable,
                 getUser().getEmployee().getId())) {
 
             PrimeFacesUtils.addMessage("Already Approved",
-                    "You already approved this purchase requisition.",
+                    "You already approved this purchase requisition",
                     FacesMessage.SEVERITY_INFO);
 
             return;
@@ -1774,7 +1779,7 @@ public class PurchasingManager implements Serializable,
                 equals(getUser().getEmployee())) {
 
             PrimeFacesUtils.addMessage("Cannot Approve",
-                    "The originator cannot approve this purchase requisition.",
+                    "The originator cannot approve this purchase requisition",
                     FacesMessage.SEVERITY_WARN);
 
             return;
@@ -1798,7 +1803,7 @@ public class PurchasingManager implements Serializable,
         } else {
 
             PrimeFacesUtils.addMessage("Cannot Approve",
-                    "You cannot approve this purchase requisition because the Total Cost is greater than your approval limit.",
+                    "You cannot approve this purchase requisition because the Total Cost is greater than your approval limit",
                     FacesMessage.SEVERITY_WARN);
 
         }
