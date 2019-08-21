@@ -683,6 +683,18 @@ public class PurchasingManager implements Serializable,
     public void setSelectedApprover(Employee selectedApprover) {
         this.selectedApprover = selectedApprover;
     }
+    
+     
+    public String getSelectedPurchaseRequisitionApprovalsNote() {
+        int requiredApprovals = 
+                    (Integer)SystemOption.getOptionValueObject(getEntityManager1(), 
+                            "requiredPRApprovals");
+//        
+//        !getSelectedPurchaseRequisition().isApproved(
+//                    requiredApprovals);
+        
+        return "There is 1 approval out of the required 3 approvals"; //tk
+    }
 
     public Boolean checkPRWorkProgressReadinessToBeChanged() {
         EntityManager em = getEntityManager1();
