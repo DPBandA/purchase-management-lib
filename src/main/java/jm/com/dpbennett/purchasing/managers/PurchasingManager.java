@@ -691,10 +691,10 @@ public class PurchasingManager implements Serializable,
                             "requiredPRApprovals");
         
         if (!getSelectedPurchaseRequisition().isApproved(requiredApprovals)) {
-            return "There is 1 approval out of the required 3 approvals"; //tk
+            return "The required number of approvals has NOT yet been received.";
         }
         else  {
-            return "There is 1 approval out of the required 3 approvals"; //tk
+            return "The required number of " + requiredApprovals + " has been received.";
         }     
         
     }
