@@ -1301,17 +1301,24 @@ public class PurchasingManager implements Serializable,
                 findActiveEmployeesByPosition(em,
                         "Procurement Officer");
 
-        for (Employee procurementOfficer : procurementOfficers) {
-            JobManagerUser procurementOfficerUser
-                    = JobManagerUser.findActiveJobManagerUserByEmployeeId(
-                            em, procurementOfficer.getId());
+//        for (Employee procurementOfficer : procurementOfficers) {
+//            JobManagerUser procurementOfficerUser
+//                    = JobManagerUser.findActiveJobManagerUserByEmployeeId(
+//                            em, procurementOfficer.getId());
+             // tk
+            System.out.println("POs " + procurementOfficers);
+            
+             // tk
+            System.out.println("current user: " + getUser());
 
-            if (!getUser().equals(procurementOfficerUser)) {
-                sendPurchaseReqEmail(em, procurementOfficerUser,
-                        "a procurement officer", action);
-            }
 
-        }
+//            // Send email to all except current usier
+//            if (!getUser().equals(procurementOfficerUser)) {
+//                sendPurchaseReqEmail(em, procurementOfficerUser,
+//                        "a procurement officer", action);
+//            }
+//
+//        }
     }
 
     private void emailPurchaseReqApprovers(String action) {
@@ -1367,7 +1374,7 @@ public class PurchasingManager implements Serializable,
             String action) {
 
         Email email = Email.findActiveEmailByName(em, "pr-email-template");
-
+      
         String prNum = getSelectedPurchaseRequisition().getNumber();
         String department = getSelectedPurchaseRequisition().
                 getOriginatingDepartment().getName();
@@ -1410,9 +1417,9 @@ public class PurchasingManager implements Serializable,
                     emailPurchaseReqApprovers("created");
                     break;
                 case EDIT:
-                    emailProcurementOfficers("edited");
+                    emailProcurementOfficers("edited"); 
                     emailDepartmentRepresentatives("edited");
-                    emailPurchaseReqApprovers("edited");
+                    emailPurchaseReqApprovers("edited");                    
                     break;
                 case APPROVE:
                     emailProcurementOfficers("approved");
@@ -1473,20 +1480,22 @@ public class PurchasingManager implements Serializable,
             getSelectedPurchaseRequisition().setIsDirty(false);
         } else {
             doPurchaseReqSearch();
+              // tk
+            System.out.println("current user: " + getUser());
             // Process actions performed during the editing of the saved PR.
-            if (getSelectedPurchaseRequisition().getId() != null) {
-                new Thread() {
-                    @Override
-                    public void run() {
-                        try {
-                            processPurchaseReqActions();
-                        } catch (Exception e) {
-                            System.out.println("Error processing PR actions: " + e);
-                        }
-                    }
-
-                }.start();
-            }
+//            if (getSelectedPurchaseRequisition().getId() != null) {
+//                new Thread() {
+//                    @Override
+//                    public void run() {
+//                        try {
+//                            processPurchaseReqActions();
+//                        } catch (Exception e) {
+//                            System.out.println("Error processing PR actions: " + e);
+//                        }
+//                    }
+//
+//                }.start();
+//            }
         }
     }
 
