@@ -694,7 +694,7 @@ public class PurchasingManager implements Serializable,
             return "The required number of approvals has NOT yet been received.";
         }
         else  {
-            return "The required number of " + requiredApprovals + " has been received.";
+            return "The required number of " + requiredApprovals + " approvals has been received.";
         }     
         
     }
@@ -754,7 +754,7 @@ public class PurchasingManager implements Serializable,
 
                 PrimeFacesUtils.addMessage("Purchase Requisition Not Completed",
                         "This purchase requisition requires " +  requiredApprovals + 
-                                "approvals before it can be marked as completed",
+                                " approvals before it can be marked as completed",
                         FacesMessage.SEVERITY_WARN);
 
                 return false;
