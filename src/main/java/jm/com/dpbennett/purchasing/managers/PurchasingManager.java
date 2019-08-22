@@ -79,6 +79,7 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import org.primefaces.PrimeFaces;
+import java.util.Calendar;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.UploadedFile;
@@ -685,6 +686,20 @@ public class PurchasingManager implements Serializable,
     }
 
     public String getSelectedPurchaseRequisitionApprovalsNote() {
+        int requiredApprovals
+                = (Integer) SystemOption.getOptionValueObject(getEntityManager1(),
+                        "requiredPRApprovals");
+
+        if (!getSelectedPurchaseRequisition().isApproved(requiredApprovals)) {
+            return "The required number of approvals has NOT yet been received.";
+        } else {
+            return "The required number of " + requiredApprovals + " approvals has been received.";
+        }
+
+    }
+    
+    // tk
+    public String getSelectedPRProcurementAmountNote() {
         int requiredApprovals
                 = (Integer) SystemOption.getOptionValueObject(getEntityManager1(),
                         "requiredPRApprovals");
@@ -1817,10 +1832,15 @@ public class PurchasingManager implements Serializable,
                         = (Integer) SystemOption.getOptionValueObject(getEntityManager1(),
                                 "requiredPRApprovals");
                 if (getSelectedPurchaseRequisition().isApproved(requiredApprovals)) {
-                    // BusinessEntityUtils.adjustDate(new Date(), Calendar.DAY_OF_MONTH, 10)
+             
                     int daysAfterPRApprovalForEDOC
                         = (Integer) SystemOption.getOptionValueObject(getEntityManager1(),
                                 "daysAfterPRApprovalForEDOC");
+                    
+                    getSelectedPurchaseRequisition()
+                            .setExpectedDateOfCompletion(
+                                    BusinessEntityUtils.adjustDate(new Date(), 
+                                            Calendar.DAY_OF_MONTH, daysAfterPRApprovalForEDOC));
                 }
             }
 
