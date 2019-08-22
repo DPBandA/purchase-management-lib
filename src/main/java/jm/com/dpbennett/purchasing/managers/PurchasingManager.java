@@ -704,11 +704,11 @@ public class PurchasingManager implements Serializable,
                 = (Integer) SystemOption.getOptionValueObject(getEntityManager1(),
                         "requiredPRApprovals");
 
-        if (!getSelectedPurchaseRequisition().isApproved(requiredApprovals)) {
-            return "The required number of approvals has NOT yet been received.";
-        } else {
-            return "The required number of " + requiredApprovals + " approvals has been received.";
-        }
+//        if (!getSelectedPurchaseRequisition().isApproved(requiredApprovals)) {
+            return "NB: This amount requires procurement.";
+//        } else {
+//            return "The required number of " + requiredApprovals + " approvals has been received.";
+//        }
 
     }
 
