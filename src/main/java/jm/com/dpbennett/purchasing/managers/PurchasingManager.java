@@ -683,25 +683,23 @@ public class PurchasingManager implements Serializable,
     public void setSelectedApprover(Employee selectedApprover) {
         this.selectedApprover = selectedApprover;
     }
-    
-     
+
     public String getSelectedPurchaseRequisitionApprovalsNote() {
-        int requiredApprovals = 
-                    (Integer)SystemOption.getOptionValueObject(getEntityManager1(), 
-                            "requiredPRApprovals");
-        
+        int requiredApprovals
+                = (Integer) SystemOption.getOptionValueObject(getEntityManager1(),
+                        "requiredPRApprovals");
+
         if (!getSelectedPurchaseRequisition().isApproved(requiredApprovals)) {
             return "The required number of approvals has NOT yet been received.";
-        }
-        else  {
+        } else {
             return "The required number of " + requiredApprovals + " approvals has been received.";
-        }     
-        
+        }
+
     }
 
     public Boolean checkPRWorkProgressReadinessToBeChanged() {
         EntityManager em = getEntityManager1();
-        
+
         if (getSelectedPurchaseRequisition().getId() != null) {
 
             // Find the currently stored PR and check it's work status
@@ -745,16 +743,16 @@ public class PurchasingManager implements Serializable,
             }
 
             // Do not allow flagging PR as completed unless it is approved.    
-            int requiredApprovals = 
-                    (Integer)SystemOption.getOptionValueObject(getEntityManager1(), 
+            int requiredApprovals
+                    = (Integer) SystemOption.getOptionValueObject(getEntityManager1(),
                             "requiredPRApprovals");
             if (!getSelectedPurchaseRequisition().isApproved(
-                    requiredApprovals) 
+                    requiredApprovals)
                     && getSelectedPurchaseRequisition().getWorkProgress().equals("Completed")) {
 
                 PrimeFacesUtils.addMessage("Purchase Requisition Not Completed",
-                        "This purchase requisition requires " +  requiredApprovals + 
-                                " approvals before it can be marked as completed",
+                        "This purchase requisition requires " + requiredApprovals
+                        + " approvals before it can be marked as completed",
                         FacesMessage.SEVERITY_WARN);
 
                 return false;
@@ -803,7 +801,7 @@ public class PurchasingManager implements Serializable,
 
                 getSelectedPurchaseRequisition().addAction(BusinessEntity.Action.COMPLETE);
             }
-            
+
             updatePurchaseReq(null);
 
         } else {
@@ -913,8 +911,8 @@ public class PurchasingManager implements Serializable,
         editPurchReqGeneralEmail();
     }
 
-    public void sendGeneralPurchaseReqEmail() { 
-        
+    public void sendGeneralPurchaseReqEmail() {
+
         final JobManagerUser currentUser = getUser();
 
         new Thread() {
@@ -1255,7 +1253,7 @@ public class PurchasingManager implements Serializable,
     public void setSelectedAttachment(Attachment selectedAttachment) {
         this.selectedAttachment = selectedAttachment;
     }
-    
+
     public void savePurchaseRequisition(
             PurchaseRequisition pr,
             String msgSavedSummary,
@@ -1291,8 +1289,8 @@ public class PurchasingManager implements Serializable,
 
     }
 
-    public void saveSelectedPurchaseRequisition() {        
-        savePurchaseRequisition(getSelectedPurchaseRequisition(), 
+    public void saveSelectedPurchaseRequisition() {
+        savePurchaseRequisition(getSelectedPurchaseRequisition(),
                 "Saved", "Purchase requisition was saved");
     }
 
@@ -1307,7 +1305,7 @@ public class PurchasingManager implements Serializable,
             JobManagerUser procurementOfficerUser
                     = JobManagerUser.findActiveJobManagerUserByEmployeeId(
                             em, procurementOfficer.getId());
-          
+
             // Send email to all except current usier
             if (!user.equals(procurementOfficerUser)) {
                 sendPurchaseReqEmail(em, procurementOfficerUser,
@@ -1370,7 +1368,7 @@ public class PurchasingManager implements Serializable,
             String action) {
 
         Email email = Email.findActiveEmailByName(em, "pr-email-template");
-      
+
         String prNum = getSelectedPurchaseRequisition().getNumber();
         String department = getSelectedPurchaseRequisition().
                 getOriginatingDepartment().getName();
@@ -1413,9 +1411,9 @@ public class PurchasingManager implements Serializable,
                     emailPurchaseReqApprovers(user, "created");
                     break;
                 case EDIT:
-                    emailProcurementOfficers(user, "edited"); 
+                    emailProcurementOfficers(user, "edited");
                     emailDepartmentRepresentatives(user, "edited");
-                    emailPurchaseReqApprovers(user, "edited");                    
+                    emailPurchaseReqApprovers(user, "edited");
                     break;
                 case APPROVE:
                     emailProcurementOfficers(user, "approved");
@@ -1476,9 +1474,9 @@ public class PurchasingManager implements Serializable,
             getSelectedPurchaseRequisition().setIsDirty(false);
         } else {
             doPurchaseReqSearch();
-            
+
             final JobManagerUser currentUser = getUser();
-           
+
             // Process actions performed during the editing of the saved PR.
             if (getSelectedPurchaseRequisition().getId() != null) {
                 new Thread() {
@@ -1812,12 +1810,26 @@ public class PurchasingManager implements Serializable,
             getSelectedPurchaseRequisition().getApprovers().add(getUser().getEmployee());
             setPRApprovalDate(getUser().getEmployee().getPositions());
 
+            // Set expected date of completion if it is not already set and the 
+            // required number of approvals received.            
+            if (getSelectedPurchaseRequisition().getExpectedDateOfCompletion() == null) {
+                int requiredApprovals
+                        = (Integer) SystemOption.getOptionValueObject(getEntityManager1(),
+                                "requiredPRApprovals");
+                if (getSelectedPurchaseRequisition().isApproved(requiredApprovals)) {
+                    // BusinessEntityUtils.adjustDate(new Date(), Calendar.DAY_OF_MONTH, 10)
+                    int daysAfterPRApprovalForEDOC
+                        = (Integer) SystemOption.getOptionValueObject(getEntityManager1(),
+                                "daysAfterPRApprovalForEDOC");
+                }
+            }
+
             updatePurchaseReq(null);
             getSelectedPurchaseRequisition().addAction(BusinessEntity.Action.APPROVE);
-            
+
             if (getSelectedPurchaseRequisition().getId() != null) {
-                savePurchaseRequisition(getSelectedPurchaseRequisition(), 
-                        "Approved and Saved", 
+                savePurchaseRequisition(getSelectedPurchaseRequisition(),
+                        "Approved and Saved",
                         "This purchase requisition was successfully approved and saved");
             }
 
