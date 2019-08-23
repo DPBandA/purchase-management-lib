@@ -700,12 +700,12 @@ public class PurchasingManager implements Serializable,
     
     // tk
     public String getSelectedPRProcurementAmountNote() {
-        int requiredApprovals
-                = (Integer) SystemOption.getOptionValueObject(getEntityManager1(),
-                        "requiredPRApprovals");
+        Double maxAmountForPRProcurement
+                = (Double) SystemOption.getOptionValueObject(getEntityManager1(),
+                        "maxAmountForPRProcurement");
 
 //        if (!getSelectedPurchaseRequisition().isApproved(requiredApprovals)) {
-            return "NB: This amount requires procurement.";
+            return "NB: This amount requires procurement: " + maxAmountForPRProcurement; //tk
 //        } else {
 //            return "The required number of " + requiredApprovals + " approvals has been received.";
 //        }
