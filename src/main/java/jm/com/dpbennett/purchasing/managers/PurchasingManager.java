@@ -80,6 +80,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import org.primefaces.PrimeFaces;
 import java.util.Calendar;
+import jm.com.dpbennett.business.entity.utils.NumberUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.UploadedFile;
@@ -698,17 +699,20 @@ public class PurchasingManager implements Serializable,
 
     }
     
-    // tk
     public String getSelectedPRProcurementAmountNote() {
         Double maxAmountForPRProcurement
                 = (Double) SystemOption.getOptionValueObject(getEntityManager1(),
                         "maxAmountForPRProcurement");
 
-//        if (!getSelectedPurchaseRequisition().isApproved(requiredApprovals)) {
-            return "NB: This amount requires procurement: " + maxAmountForPRProcurement; //tk
-//        } else {
-//            return "The required number of " + requiredApprovals + " approvals has been received.";
-//        }
+        if (getSelectedPurchaseRequisition().getTotalCost() > maxAmountForPRProcurement) {
+            return "The total cost of " 
+                    + NumberUtils.formatAsCurrency(getSelectedPurchaseRequisition().getTotalCost(), "$") 
+                    + " exceeds the maximum of " + 
+                    NumberUtils.formatAsCurrency(maxAmountForPRProcurement, "$")
+                    + ". Procurement is required.";
+        } else {
+            return "";
+        }
 
     }
 
@@ -1276,7 +1280,7 @@ public class PurchasingManager implements Serializable,
 
         if (pr.getIsDirty()) {
             ReturnMessage returnMessage;
-
+           
             returnMessage = pr.prepareAndSave(getEntityManager1(), getUser());
 
             if (returnMessage.isSuccess()) {
