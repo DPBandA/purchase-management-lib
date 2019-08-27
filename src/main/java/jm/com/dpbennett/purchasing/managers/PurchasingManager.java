@@ -260,6 +260,8 @@ public class PurchasingManager implements Serializable,
 
     public void createNewSupplier() {
         selectedSupplier = new Supplier("", true);
+        
+        editSelectedSupplier();
     }
 
     public void addNewSupplier() {
