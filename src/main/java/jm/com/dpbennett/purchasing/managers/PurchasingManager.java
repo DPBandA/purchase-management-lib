@@ -514,6 +514,9 @@ public class PurchasingManager implements Serializable,
     }
 
     public List<Supplier> getFoundSuppliers() {
+        if (foundSuppliers == null) {
+            doSupplierSearch();
+        }
         return foundSuppliers;
     }
 
@@ -1635,7 +1638,7 @@ public class PurchasingManager implements Serializable,
         toEmployees = new ArrayList<>();
         supplierSearchText = "";
         searchText = "";
-        foundSuppliers = new ArrayList<>();
+        //foundSuppliers = new ArrayList<>();
 
         getSystemManager().addSingleLoginActionListener(this);
     }
