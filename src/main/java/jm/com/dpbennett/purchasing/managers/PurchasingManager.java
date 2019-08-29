@@ -175,7 +175,9 @@ public class PurchasingManager implements Serializable,
             }
 
         } catch (IOException ex) {
-            Logger.getLogger(FileUploadManager.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Error uploading file: " + ex);
+            
+            PrimeFacesUtils.addMessage("Upload Error", event.getFile().getFileName() + " was NOT uploaded.", FacesMessage.SEVERITY_ERROR);
         }
     }
 
