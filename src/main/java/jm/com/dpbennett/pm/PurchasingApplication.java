@@ -17,7 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 Email: info@dpbennett.com.jm
  */
-package jm.com.dpbennett.purchasing;
+package jm.com.dpbennett.pm;
 
 import java.io.Serializable;
 import javax.ejb.Singleton;

@@ -17,7 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 Email: info@dpbennett.com.jm
  */
-package jm.com.dpbennett.purchasing.managers;
+package jm.com.dpbennett.pm.manager;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -30,8 +30,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.AjaxBehaviorEvent;
@@ -59,19 +57,6 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.model.StreamedContent;
 import jm.com.dpbennett.business.entity.utils.BusinessEntityUtils;
 import jm.com.dpbennett.business.entity.utils.ReturnMessage;
-import jm.com.dpbennett.wal.Authentication;
-import jm.com.dpbennett.wal.managers.FileUploadManager;
-import jm.com.dpbennett.wal.managers.SystemManager;
-import jm.com.dpbennett.wal.managers.SystemManager.LoginActionListener;
-import jm.com.dpbennett.wal.managers.SystemManager.SearchActionListener;
-import static jm.com.dpbennett.wal.managers.SystemManager.getStringListAsSelectItems;
-import jm.com.dpbennett.wal.utils.BeanUtils;
-import jm.com.dpbennett.wal.utils.FinancialUtils;
-import jm.com.dpbennett.wal.utils.MainTabView;
-import jm.com.dpbennett.wal.utils.PrimeFacesUtils;
-import jm.com.dpbennett.wal.utils.Utils;
-import jm.com.dpbennett.wal.validator.AddressValidator;
-import jm.com.dpbennett.wal.validator.ContactValidator;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
@@ -81,6 +66,18 @@ import net.sf.jasperreports.engine.JasperReport;
 import org.primefaces.PrimeFaces;
 import java.util.Calendar;
 import jm.com.dpbennett.business.entity.utils.NumberUtils;
+import jm.com.dpbennett.hrm.validator.AddressValidator;
+import jm.com.dpbennett.hrm.validator.ContactValidator;
+import jm.com.dpbennett.sm.Authentication;
+import jm.com.dpbennett.sm.manager.SystemManager;
+import jm.com.dpbennett.sm.manager.SystemManager.LoginActionListener;
+import jm.com.dpbennett.sm.manager.SystemManager.SearchActionListener;
+import static jm.com.dpbennett.sm.manager.SystemManager.getStringListAsSelectItems;
+import jm.com.dpbennett.sm.util.BeanUtils;
+import jm.com.dpbennett.sm.util.FinancialUtils;
+import jm.com.dpbennett.sm.util.MainTabView;
+import jm.com.dpbennett.sm.util.PrimeFacesUtils;
+import jm.com.dpbennett.sm.util.Utils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.UploadedFile;
@@ -1640,9 +1637,9 @@ public class PurchasingManager implements Serializable,
         toEmployees = new ArrayList<>();
         supplierSearchText = "";
         searchText = "";
-        //foundSuppliers = new ArrayList<>();
 
         getSystemManager().addSingleLoginActionListener(this);
+        getSystemManager().addSingleSearchActionListener(this);
     }
 
     public void reset() {
@@ -1972,7 +1969,24 @@ public class PurchasingManager implements Serializable,
 
     @Override
     public void doLogin() {
-        getSystemManager().addSingleSearchActionListener(this);
+        initDashboard();
+        initMainTabView();
+    }
+    
+    private void initDashboard() {
+
+        if (getUser().getModules().getPurchaseManagementModule()) {
+            getSystemManager().getDashboard().openTab("Procurement");
+        }
+
+    }
+
+    private void initMainTabView() {
+
+        if (getUser().getModules().getPurchaseManagementModule()) {
+            getSystemManager().getMainTabView().openTab("Purchase Requisitions");
+        }
+
     }
 
 }
