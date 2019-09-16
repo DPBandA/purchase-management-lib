@@ -71,7 +71,6 @@ import jm.com.dpbennett.hrm.validator.ContactValidator;
 import jm.com.dpbennett.sm.Authentication;
 import jm.com.dpbennett.sm.manager.SystemManager;
 import jm.com.dpbennett.sm.manager.SystemManager.LoginActionListener;
-import jm.com.dpbennett.sm.manager.SystemManager.SearchActionListener;
 import static jm.com.dpbennett.sm.manager.SystemManager.getStringListAsSelectItems;
 import jm.com.dpbennett.sm.util.BeanUtils;
 import jm.com.dpbennett.sm.util.FinancialUtils;
@@ -86,8 +85,7 @@ import org.primefaces.model.UploadedFile;
  *
  * @author Desmond Bennett
  */
-public class PurchasingManager implements Serializable,
-        SearchActionListener, LoginActionListener {
+public class PurchasingManager implements Serializable, LoginActionListener {
 
     @PersistenceUnit(unitName = "JMTSPU")
     private EntityManagerFactory EMF1;
@@ -1639,7 +1637,6 @@ public class PurchasingManager implements Serializable,
         searchText = "";
 
         getSystemManager().addSingleLoginActionListener(this);
-        getSystemManager().addSingleSearchActionListener(this);
     }
 
     public void reset() {
@@ -1962,7 +1959,6 @@ public class PurchasingManager implements Serializable,
                 "prPriorityCodes");
     }
 
-    @Override
     public void doDefaultSearch() {
         doSearch();
     }
