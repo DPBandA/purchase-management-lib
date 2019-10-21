@@ -142,6 +142,8 @@ public class PurchasingManager implements Serializable, LoginActionListener {
 
     public void handleFileUpload(FileUploadEvent event) {
         try {
+            System.out.println("Handling file upload..."); //tk
+            
             OutputStream outputStream;
 
             // Save file
@@ -1000,6 +1002,8 @@ public class PurchasingManager implements Serializable, LoginActionListener {
         HashMap parameters = new HashMap();
 
         try {
+            
+            System.out.println("pr id: " + getSelectedPurchaseRequisition().getId()); // tk
             parameters.put("prId", getSelectedPurchaseRequisition().getId());
 
             parameters.put("purchReqNo", getSelectedPurchaseRequisition().getNumber());
