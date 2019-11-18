@@ -42,15 +42,15 @@ import jm.com.dpbennett.business.entity.dm.Attachment;
 import jm.com.dpbennett.business.entity.BusinessEntity;
 import jm.com.dpbennett.business.entity.hrm.Contact;
 import jm.com.dpbennett.business.entity.fm.CostComponent;
-import jm.com.dpbennett.business.entity.DatePeriod;
+import jm.com.dpbennett.business.entity.rm.DatePeriod;
 import jm.com.dpbennett.business.entity.hrm.Department;
 import jm.com.dpbennett.business.entity.hrm.Email;
 import jm.com.dpbennett.business.entity.hrm.Employee;
 import jm.com.dpbennett.business.entity.hrm.EmployeePosition;
 import jm.com.dpbennett.business.entity.hrm.Internet;
-import jm.com.dpbennett.business.entity.jmts.JobManagerUser;
+import jm.com.dpbennett.business.entity.hrm.User;
 import jm.com.dpbennett.business.entity.pm.PurchaseRequisition;
-import jm.com.dpbennett.business.entity.Supplier;
+import jm.com.dpbennett.business.entity.pm.Supplier;
 import jm.com.dpbennett.business.entity.sm.SystemOption;
 import org.primefaces.event.CellEditEvent;
 import org.primefaces.event.SelectEvent;
@@ -936,7 +936,7 @@ public class PurchasingManager implements Serializable, LoginActionListener {
 
     public void sendGeneralPurchaseReqEmail() {
 
-        final JobManagerUser currentUser = getUser();
+        final User currentUser = getUser();
 
         new Thread() {
             @Override
@@ -946,8 +946,8 @@ public class PurchasingManager implements Serializable, LoginActionListener {
                     Email email = Email.findActiveEmailByName(em, "pr-gen-email-template");
 
                     for (Employee toEmployee : getToEmployees()) {
-                        JobManagerUser toEmployeeUser
-                                = JobManagerUser.findActiveJobManagerUserByEmployeeId(
+                        User toEmployeeUser
+                                = User.findActiveJobManagerUserByEmployeeId(
                                         em, toEmployee.getId());
 
                         Utils.postMail(null,
@@ -1319,7 +1319,7 @@ public class PurchasingManager implements Serializable, LoginActionListener {
                 "Saved", "Purchase requisition was saved");
     }
 
-    private void emailProcurementOfficers(JobManagerUser user, String action) {
+    private void emailProcurementOfficers(User user, String action) {
         EntityManager em = getEntityManager1();
 
         List<Employee> procurementOfficers = Employee.
@@ -1327,8 +1327,8 @@ public class PurchasingManager implements Serializable, LoginActionListener {
                         "Procurement Officer");
 
         for (Employee procurementOfficer : procurementOfficers) {
-            JobManagerUser procurementOfficerUser
-                    = JobManagerUser.findActiveJobManagerUserByEmployeeId(
+            User procurementOfficerUser
+                    = User.findActiveJobManagerUserByEmployeeId(
                             em, procurementOfficer.getId());
 
             // Send email to all except current usier
@@ -1340,13 +1340,13 @@ public class PurchasingManager implements Serializable, LoginActionListener {
         }
     }
 
-    private void emailPurchaseReqApprovers(JobManagerUser user, String action) {
+    private void emailPurchaseReqApprovers(User user, String action) {
         EntityManager em = getEntityManager1();
 
         for (Employee approver : getSelectedPurchaseRequisition().getApprovers()) {
 
-            JobManagerUser approverUser
-                    = JobManagerUser.findActiveJobManagerUserByEmployeeId(
+            User approverUser
+                    = User.findActiveJobManagerUserByEmployeeId(
                             em, approver.getId());
 
             if (!user.equals(approverUser)) {
@@ -1357,16 +1357,16 @@ public class PurchasingManager implements Serializable, LoginActionListener {
         }
     }
 
-    private void emailDepartmentRepresentatives(JobManagerUser user, String action) {
+    private void emailDepartmentRepresentatives(User user, String action) {
         EntityManager em = getEntityManager1();
 
-        JobManagerUser originatorUser = JobManagerUser.
+        User originatorUser = User.
                 findActiveJobManagerUserByEmployeeId(em,
                         getSelectedPurchaseRequisition().getOriginator().getId());
         Employee head = getSelectedPurchaseRequisition().getOriginatingDepartment().getHead();
         Employee actingHead = getSelectedPurchaseRequisition().getOriginatingDepartment().getActingHead();
-        JobManagerUser headUser = JobManagerUser.findActiveJobManagerUserByEmployeeId(em, head.getId());
-        JobManagerUser actingHeadUser = JobManagerUser.findActiveJobManagerUserByEmployeeId(em, actingHead.getId());
+        User headUser = User.findActiveJobManagerUserByEmployeeId(em, head.getId());
+        User actingHeadUser = User.findActiveJobManagerUserByEmployeeId(em, actingHead.getId());
 
         // Send to originator
         if (!user.equals(originatorUser)) {
@@ -1388,7 +1388,7 @@ public class PurchasingManager implements Serializable, LoginActionListener {
 
     private void sendPurchaseReqEmail(
             EntityManager em,
-            JobManagerUser user,
+            User user,
             String role,
             String action) {
 
@@ -1426,7 +1426,7 @@ public class PurchasingManager implements Serializable, LoginActionListener {
                 em);
     }
 
-    private synchronized void processPurchaseReqActions(JobManagerUser user) {
+    private synchronized void processPurchaseReqActions(User user) {
 
         for (BusinessEntity.Action action : getSelectedPurchaseRequisition().getActions()) {
             switch (action) {
@@ -1500,7 +1500,7 @@ public class PurchasingManager implements Serializable, LoginActionListener {
         } else {
             doPurchaseReqSearch();
 
-            final JobManagerUser currentUser = getUser();
+            final User currentUser = getUser();
 
             // Process actions performed during the editing of the saved PR.
             if (getSelectedPurchaseRequisition().getId() != null) {
@@ -1661,7 +1661,7 @@ public class PurchasingManager implements Serializable, LoginActionListener {
         return BeanUtils.findBean("authentication");
     }
 
-    public JobManagerUser getUser() {
+    public User getUser() {
         return getAuthentication().getUser();
     }
 
