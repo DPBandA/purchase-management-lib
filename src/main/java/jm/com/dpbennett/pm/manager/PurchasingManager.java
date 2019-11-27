@@ -1629,6 +1629,12 @@ public class PurchasingManager implements Serializable, AuthenticationListener {
     }
 
     private void init() {
+        reset();
+
+        getSystemManager().addSingleAuthenticationListener(this);
+    }
+
+    public void reset() {
         selectedCostComponent = null;
         searchType = "Purchase requisitions";
         dateSearchPeriod = new DatePeriod("This year", "year",
@@ -1639,12 +1645,6 @@ public class PurchasingManager implements Serializable, AuthenticationListener {
         toEmployees = new ArrayList<>();
         supplierSearchText = "";
         searchText = "";
-
-        getSystemManager().addSingleAuthenticationListener(this);
-    }
-
-    public void reset() {
-        init();
     }
 
     public EntityManager getEntityManager1() {
@@ -1991,7 +1991,7 @@ public class PurchasingManager implements Serializable, AuthenticationListener {
 
     @Override
     public void completeLogout() {
-        System.out.println("Complete logout...");
+        reset();
     }
 
 }
