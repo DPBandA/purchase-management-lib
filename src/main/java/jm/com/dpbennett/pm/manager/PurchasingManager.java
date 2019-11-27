@@ -69,8 +69,8 @@ import jm.com.dpbennett.business.entity.util.NumberUtils;
 import jm.com.dpbennett.hrm.validator.AddressValidator;
 import jm.com.dpbennett.hrm.validator.ContactValidator;
 import jm.com.dpbennett.sm.Authentication;
+import jm.com.dpbennett.sm.Authentication.AuthenticationListener;
 import jm.com.dpbennett.sm.manager.SystemManager;
-import jm.com.dpbennett.sm.manager.SystemManager.LoginActionListener;
 import static jm.com.dpbennett.sm.manager.SystemManager.getStringListAsSelectItems;
 import jm.com.dpbennett.sm.util.BeanUtils;
 import jm.com.dpbennett.sm.util.FinancialUtils;
@@ -85,7 +85,7 @@ import org.primefaces.model.UploadedFile;
  *
  * @author Desmond Bennett
  */
-public class PurchasingManager implements Serializable, LoginActionListener {
+public class PurchasingManager implements Serializable, AuthenticationListener {
 
     @PersistenceUnit(unitName = "JMTSPU")
     private EntityManagerFactory EMF1;
@@ -143,7 +143,7 @@ public class PurchasingManager implements Serializable, LoginActionListener {
     public void handleFileUpload(FileUploadEvent event) {
         try {
             System.out.println("Handling file upload..."); //tk
-            
+
             OutputStream outputStream;
 
             // Save file
@@ -173,7 +173,7 @@ public class PurchasingManager implements Serializable, LoginActionListener {
 
         } catch (IOException ex) {
             System.out.println("Error uploading file: " + ex);
-            
+
             PrimeFacesUtils.addMessage("Upload Error", event.getFile().getFileName() + " was NOT uploaded.", FacesMessage.SEVERITY_ERROR);
         }
     }
@@ -259,7 +259,7 @@ public class PurchasingManager implements Serializable, LoginActionListener {
 
     public void createNewSupplier() {
         selectedSupplier = new Supplier("", true);
-        
+
         editSelectedSupplier();
     }
 
@@ -702,17 +702,17 @@ public class PurchasingManager implements Serializable, LoginActionListener {
         }
 
     }
-    
+
     public String getSelectedPRProcurementAmountNote() {
         Double maxAmountForPRProcurement
                 = (Double) SystemOption.getOptionValueObject(getEntityManager1(),
                         "maxAmountForPRProcurement");
 
         if (getSelectedPurchaseRequisition().getTotalCost() > maxAmountForPRProcurement) {
-            return "The total cost of " 
-                    + NumberUtils.formatAsCurrency(getSelectedPurchaseRequisition().getTotalCost(), "$") 
-                    + " exceeds the maximum of " + 
-                    NumberUtils.formatAsCurrency(maxAmountForPRProcurement, "$")
+            return "The total cost of "
+                    + NumberUtils.formatAsCurrency(getSelectedPurchaseRequisition().getTotalCost(), "$")
+                    + " exceeds the maximum of "
+                    + NumberUtils.formatAsCurrency(maxAmountForPRProcurement, "$")
                     + ". Procurement is required.";
         } else {
             return "";
@@ -1002,7 +1002,7 @@ public class PurchasingManager implements Serializable, LoginActionListener {
         HashMap parameters = new HashMap();
 
         try {
-            
+
             System.out.println("pr id: " + getSelectedPurchaseRequisition().getId()); // tk
             parameters.put("prId", getSelectedPurchaseRequisition().getId());
 
@@ -1286,7 +1286,7 @@ public class PurchasingManager implements Serializable, LoginActionListener {
 
         if (pr.getIsDirty()) {
             ReturnMessage returnMessage;
-           
+
             returnMessage = pr.prepareAndSave(getEntityManager1(), getUser());
 
             if (returnMessage.isSuccess()) {
@@ -1640,7 +1640,7 @@ public class PurchasingManager implements Serializable, LoginActionListener {
         supplierSearchText = "";
         searchText = "";
 
-        getSystemManager().addSingleLoginActionListener(this);
+        getSystemManager().addSingleAuthenticationListener(this);
     }
 
     public void reset() {
@@ -1841,14 +1841,14 @@ public class PurchasingManager implements Serializable, LoginActionListener {
                         = (Integer) SystemOption.getOptionValueObject(getEntityManager1(),
                                 "requiredPRApprovals");
                 if (getSelectedPurchaseRequisition().isApproved(requiredApprovals)) {
-             
+
                     int daysAfterPRApprovalForEDOC
-                        = (Integer) SystemOption.getOptionValueObject(getEntityManager1(),
-                                "daysAfterPRApprovalForEDOC");
-                    
+                            = (Integer) SystemOption.getOptionValueObject(getEntityManager1(),
+                                    "daysAfterPRApprovalForEDOC");
+
                     getSelectedPurchaseRequisition()
                             .setExpectedDateOfCompletion(
-                                    BusinessEntityUtils.adjustDate(new Date(), 
+                                    BusinessEntityUtils.adjustDate(new Date(),
                                             Calendar.DAY_OF_MONTH, daysAfterPRApprovalForEDOC));
                 }
             }
@@ -1967,12 +1967,6 @@ public class PurchasingManager implements Serializable, LoginActionListener {
         doSearch();
     }
 
-    @Override
-    public void doLogin() {
-        initDashboard();
-        initMainTabView();
-    }
-    
     private void initDashboard() {
 
         if (getUser().getModules().getPurchaseManagementModule()) {
@@ -1987,6 +1981,17 @@ public class PurchasingManager implements Serializable, LoginActionListener {
             getSystemManager().getMainTabView().openTab("Purchase Requisitions");
         }
 
+    }
+
+    @Override
+    public void completeLogin() {
+        initDashboard();
+        initMainTabView();
+    }
+
+    @Override
+    public void completeLogout() {
+        System.out.println("Complete logout...");
     }
 
 }
