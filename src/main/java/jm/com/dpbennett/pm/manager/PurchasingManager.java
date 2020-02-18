@@ -1,6 +1,6 @@
 /*
 Purchase Management
-Copyright (C) 2019  D P Bennett & Associates Limited
+Copyright (C) 2020  D P Bennett & Associates Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
@@ -142,7 +142,6 @@ public class PurchasingManager implements Serializable, AuthenticationListener {
 
     public void handleFileUpload(FileUploadEvent event) {
         try {
-            System.out.println("Handling file upload..."); //tk
 
             OutputStream outputStream;
 
@@ -1319,7 +1318,7 @@ public class PurchasingManager implements Serializable, AuthenticationListener {
                 "Saved", "Purchase requisition was saved");
     }
 
-    private void emailProcurementOfficers(User user, String action) {
+    private void emailProcurementOfficers(String action) {
         EntityManager em = getEntityManager1();
 
         List<Employee> procurementOfficers = Employee.
@@ -1327,68 +1326,35 @@ public class PurchasingManager implements Serializable, AuthenticationListener {
                         "Procurement Officer");
 
         for (Employee procurementOfficer : procurementOfficers) {
-            User procurementOfficerUser
-                    = User.findActiveJobManagerUserByEmployeeId(
-                            em, procurementOfficer.getId());
-
-            // Send email to all except current usier
-            if (!user.equals(procurementOfficerUser)) {
-                sendPurchaseReqEmail(em, procurementOfficerUser,
-                        "a procurement officer", action);
-            }
-
+            sendPurchaseReqEmail(em, procurementOfficer,
+                    "a procurement officer", action);
         }
     }
 
-    private void emailPurchaseReqApprovers(User user, String action) {
+    private void emailPurchaseReqApprovers(String action) {
         EntityManager em = getEntityManager1();
 
         for (Employee approver : getSelectedPurchaseRequisition().getApprovers()) {
-
-            User approverUser
-                    = User.findActiveJobManagerUserByEmployeeId(
-                            em, approver.getId());
-
-            if (!user.equals(approverUser)) {
-                sendPurchaseReqEmail(em, approverUser,
-                        "an approver", action);
-            }
-
+            sendPurchaseReqEmail(em, approver, "an approver", action);
         }
     }
 
-    private void emailDepartmentRepresentatives(User user, String action) {
+    private void emailDepartmentRepresentatives(String action) {
         EntityManager em = getEntityManager1();
 
-        User originatorUser = User.
-                findActiveJobManagerUserByEmployeeId(em,
-                        getSelectedPurchaseRequisition().getOriginator().getId());
         Employee head = getSelectedPurchaseRequisition().getOriginatingDepartment().getHead();
         Employee actingHead = getSelectedPurchaseRequisition().getOriginatingDepartment().getActingHead();
-        User headUser = User.findActiveJobManagerUserByEmployeeId(em, head.getId());
-        User actingHeadUser = User.findActiveJobManagerUserByEmployeeId(em, actingHead.getId());
 
-        // Send to originator
-        if (!user.equals(originatorUser)) {
-            sendPurchaseReqEmail(em, originatorUser, "the orginator", action);
-        }
+        sendPurchaseReqEmail(em, head, "a department head", action);
 
-        // Send to department head
-        if (!user.equals(headUser)) {
-            sendPurchaseReqEmail(em, headUser, "a department head", action);
-        }
-
-        // Send to acting head if active.
-        if (!user.equals(actingHeadUser)) {
-            if (getSelectedPurchaseRequisition().getOriginatingDepartment().getActingHeadActive()) {
-                sendPurchaseReqEmail(em, actingHeadUser, "an acting department head", action);
-            }
+        if (getSelectedPurchaseRequisition().getOriginatingDepartment().getActingHeadActive()) {
+            sendPurchaseReqEmail(em, actingHead, "an acting department head", action);
         }
     }
 
     private void sendPurchaseReqEmail(
             EntityManager em,
-            User user,
+            Employee employee,
             String role,
             String action) {
 
@@ -1405,15 +1371,15 @@ public class PurchasingManager implements Serializable, AuthenticationListener {
         String description = getSelectedPurchaseRequisition().getDescription();
 
         Utils.postMail(null, null,
-                user,
+                null,
                 email.getSubject().
                         replace("{action}", action).
                         replace("{purchaseRequisitionNumber}", prNum),
                 email.getContent("/correspondences/").
                         replace("{title}",
-                                user.getEmployee().getTitle()).
+                                employee.getTitle()).
                         replace("{surname}",
-                                user.getEmployee().getLastName()).
+                                employee.getLastName()).
                         replace("{JMTSURL}", JMTSURL).
                         replace("{purchaseRequisitionNumber}", prNum).
                         replace("{originator}", originator).
@@ -1431,24 +1397,24 @@ public class PurchasingManager implements Serializable, AuthenticationListener {
         for (BusinessEntity.Action action : getSelectedPurchaseRequisition().getActions()) {
             switch (action) {
                 case CREATE:
-                    emailProcurementOfficers(user, "created");
-                    emailDepartmentRepresentatives(user, "created");
-                    emailPurchaseReqApprovers(user, "created");
+                    emailProcurementOfficers("created");
+                    emailDepartmentRepresentatives("created");
+                    emailPurchaseReqApprovers("created");
                     break;
                 case EDIT:
-                    emailProcurementOfficers(user, "edited");
-                    emailDepartmentRepresentatives(user, "edited");
-                    emailPurchaseReqApprovers(user, "edited");
+                    emailProcurementOfficers("edited");
+                    emailDepartmentRepresentatives("edited");
+                    emailPurchaseReqApprovers("edited");
                     break;
                 case APPROVE:
-                    emailProcurementOfficers(user, "approved");
-                    emailDepartmentRepresentatives(user, "approved");
-                    emailPurchaseReqApprovers(user, "approved");
+                    emailProcurementOfficers("approved");
+                    emailDepartmentRepresentatives("approved");
+                    emailPurchaseReqApprovers("approved");
                     break;
                 case COMPLETE:
-                    emailProcurementOfficers(user, "completed");
-                    emailDepartmentRepresentatives(user, "completed");
-                    emailPurchaseReqApprovers(user, "completed");
+                    emailProcurementOfficers("completed");
+                    emailDepartmentRepresentatives("completed");
+                    emailPurchaseReqApprovers("completed");
                     break;
                 default:
                     break;
@@ -1508,6 +1474,9 @@ public class PurchasingManager implements Serializable, AuthenticationListener {
                     @Override
                     public void run() {
                         try {
+                            System.out.println("Processing PR Actions..."
+                                    + // tk
+                                    getSelectedPurchaseRequisition().getActions());
                             processPurchaseReqActions(currentUser);
                         } catch (Exception e) {
                             System.out.println("Error processing PR actions: " + e);
@@ -1791,12 +1760,9 @@ public class PurchasingManager implements Serializable, AuthenticationListener {
     }
 
     public void addNewAttachment(ActionEvent event) {
-        System.out.println("Adding new attachment"); // tk
-
-        addAttachment(); // tk
+        addAttachment();
     }
 
-    // tk
     public void addAttachment() {
 
         PrimeFacesUtils.openDialog(null, "/common/attachmentDialog", true, true, true, 450, 700);

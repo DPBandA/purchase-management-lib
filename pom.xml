@@ -28,7 +28,13 @@
     </build>
     
     <dependencies>
-         <dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>business-entity-library</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>system-management-lib</artifactId>
             <version>1.0.0</version>
@@ -37,7 +43,6 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>human-resource-management-lib</artifactId>
             <version>1.0.0</version>
-        </dependency>
-        
+        </dependency>        
     </dependencies>
 </project>
