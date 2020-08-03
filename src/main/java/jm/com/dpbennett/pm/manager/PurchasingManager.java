@@ -945,13 +945,10 @@ public class PurchasingManager implements Serializable, AuthenticationListener {
                     Email email = Email.findActiveEmailByName(em, "pr-gen-email-template");
 
                     for (Employee toEmployee : getToEmployees()) {
-                        User toEmployeeUser
-                                = User.findActiveJobManagerUserByEmployeeId(
-                                        em, toEmployee.getId());
-
+                     
                         Utils.postMail(null,
                                 currentUser.getEmployee(),
-                                toEmployeeUser,
+                                toEmployee,
                                 getPurchaseReqEmailSubject(),
                                 getPurchaseReqEmailContent().
                                         replace("{title}",
