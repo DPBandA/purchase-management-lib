@@ -79,7 +79,7 @@ import jm.com.dpbennett.sm.util.PrimeFacesUtils;
 import jm.com.dpbennett.sm.util.Utils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
-import org.primefaces.model.UploadedFile;
+import org.primefaces.model.file.UploadedFile;
 
 /**
  *
@@ -152,7 +152,7 @@ public class PurchasingManager implements Serializable, AuthenticationListener {
             File fileToSave
                     = new File(uploadedFilePath);
             outputStream = new FileOutputStream(fileToSave);
-            outputStream.write(event.getFile().getContents());
+            outputStream.write(event.getFile().getContent());
             outputStream.close();
 
             // Create attachment and save PR.            
